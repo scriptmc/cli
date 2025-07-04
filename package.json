@@ -1,0 +1,44 @@
+{
+  "name": "@scriptmc/cli",
+  "version": "1.0.0",
+  "description": "A ScriptMC tool that simplifies the creation and build process of Minecraft Bedrock addons — made for addon creators who want speed, structure, and simplicity.",
+  "bin": {
+    "smc": "dist/main.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "configs",
+    "LICENSE",
+    "package.json"
+  ],
+  "keywords": [
+    "scriptmc",
+    "minecraft",
+    "bedrock",
+    "minecraft bedrock",
+    "addon creator",
+    "addon maker",
+    "cli"
+  ],
+  "author": "athumjs",
+  "license": "MIT",
+  "type": "commonjs",
+  "dependencies": {
+    "archiver": "^7.0.1",
+    "chokidar": "^4.0.3",
+    "esbuild": "^0.25.5",
+    "fuse.js": "^7.1.0",
+    "inquirer": "^12.6.3",
+    "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "@types/archiver": "^6.0.3",
+    "@types/node": "^24.0.1",
+    "typescript": "^5.8.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/scriptmc/cli"
+  }
+}
