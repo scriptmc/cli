@@ -15,7 +15,7 @@ export async function init(name: string): Promise<void> {
     );
   event("sucess", "wait...");
   try {
-    execSync("npm i @scriptmc/jsonts", { cwd: pathMine });
+    execSync("npm i @scriptmc/jsonts@latest", { cwd: pathMine });
   } catch (err) {
     const error: { message: string } = err as { message: string };
     console.clear();

@@ -1,6 +1,6 @@
 {
   "name": "@scriptmc/cli",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A ScriptMC tool that simplifies the creation and build process of Minecraft Bedrock addons — made for addon creators who want speed, structure, and simplicity.",
   "bin": {
     "smc": "dist/main.js"

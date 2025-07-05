@@ -52,112 +52,133 @@ export async function start(type: string, name: string): Promise<void> {
     )
       event("error", `JsonTS not found: ${name}`);
     function readDir(pathDir: string) {
-      const watcher = chokidar.watch(path.join(pathMine, "jsonTS"), {
+      const watcher = chokidar.watch(pathDir, {
         ignoreInitial: true,
       });
-      watcher.on("change", (pathFile) => {
-        fs.readdirSync(pathDir).forEach(async (fd) => {
-          if (!path.extname(fd)) return readDir(path.join(pathDir, fd));
-          let js: boolean = false;
-          if (
-            fd.endsWith(".item.ts") ||
-            fd.endsWith(".block.ts") ||
-            fd.endsWith(".entity.ts")
-          ) {
-            await build({
-              entryPoints: [path.join(pathDir, fd)],
-              outfile: path.join(pathDir, fd.replace(".ts", ".js")),
-              platform: "node",
-              target: "esnext",
-              format: "esm",
-            }).catch(() => {
-              return;
-            });
-            js = true;
-          }
-          try {
-            execFileSync("node", [
-              path.join(pathDir, fd.replace(".ts", ".js")),
-            ]);
-          } catch (err) {
+      watcher.on("change", async (pathFile) => {
+        let js: boolean = false;
+        if (
+          path.basename(pathFile).endsWith(".item.ts") ||
+          path.basename(pathFile).endsWith(".block.ts") ||
+          path.basename(pathFile).endsWith(".entity.ts")
+        ) {
+          await build({
+            entryPoints: [pathFile],
+            outfile: path.join(
+              pathDir,
+              path.basename(pathFile).replace(".ts", ".js")
+            ),
+            platform: "node",
+            target: "esnext",
+            format: "esm",
+          }).catch(() => {
             return;
-          }
-          if (
-            fs.existsSync(
-              path.join(
-                pathMine,
-                "node_modules",
-                "@scriptmc/jsonts",
-                `${fd.match(/^.*\.(item|block|entity)\..*$/)![1]}.json`
-              )
-            )
-          ) {
-            const code: string = fs.readFileSync(
-              path.join(
-                pathMine,
-                "node_modules",
-                "@scriptmc/jsonts",
-                `${fd.match(/^.*\.(item|block|entity)\..*$/)![1]}.json`
-              ),
-              "utf-8"
-            );
-            if (fd.includes("item")) {
-              if (!fs.existsSync(path.join(pathMine, "items")))
-                fs.mkdirSync(path.join(pathMine, "items"));
-              fs.writeFileSync(
-                path.join(
-                  pathMine,
-                  "items",
-                  `${fd.match(/^([^\.]+)\..*$/)![1]}.json`
-                ),
-                code
-              );
-            } else if (fd.includes("block")) {
-              if (!fs.existsSync(path.join(pathMine, "blocks")))
-                fs.mkdirSync(path.join(pathMine, "blocks"));
-              fs.writeFileSync(
-                path.join(
-                  pathMine,
-                  "blocks",
-                  `${fd.match(/^([^\.]+)\..*$/)![1]}.json`
-                ),
-                code
-              );
-            } else {
-              if (!fs.existsSync(path.join(pathMine, "entities")))
-                fs.mkdirSync(path.join(pathMine, "entities"));
-              fs.writeFileSync(
-                path.join(
-                  pathMine,
-                  "entities",
-                  `${fd.match(/^([^\.]+)\..*$/)![1]}.json`
-                ),
-                code
-              );
-            }
-            fs.rmSync(
-              path.join(
-                pathMine,
-                "node_modules",
-                "@scriptmc/jsonts",
-                `${fd.match(/^.*\.(item|block|entity)\..*$/)![1]}.json`
-              ),
-              { force: true, recursive: true }
-            );
-            console.clear();
-            event(
-              "sucess",
-              `change ${colors.blue(
-                colors.italic(path.basename(pathFile))
-              )} file`
-            );
-          }
+          });
+          js = true;
+        }
+        try {
+          execFileSync("node", [
+            path.join(pathDir, path.basename(pathFile).replace(".ts", ".js")),
+          ]);
+        } catch (err) {
           if (js)
-            fs.rmSync(path.join(pathDir, fd.replace(".ts", ".js")), {
+            fs.rmSync(
+              path.join(pathDir, path.basename(pathFile).replace(".ts", ".js")),
+              {
+                force: true,
+                recursive: true,
+              }
+            );
+          return;
+        }
+        if (
+          fs.existsSync(
+            path.join(
+              pathMine,
+              "node_modules",
+              "@scriptmc/jsonts",
+              `${
+                path
+                  .basename(pathFile)
+                  .match(/^.*\.(item|block|entity)\..*$/)![1]
+              }.json`
+            )
+          )
+        ) {
+          const code: string = fs.readFileSync(
+            path.join(
+              pathMine,
+              "node_modules",
+              "@scriptmc/jsonts",
+              `${
+                path
+                  .basename(pathFile)
+                  .match(/^.*\.(item|block|entity)\..*$/)![1]
+              }.json`
+            ),
+            "utf-8"
+          );
+          if (path.basename(pathFile).includes("item")) {
+            if (!fs.existsSync(path.join(pathMine, "items")))
+              fs.mkdirSync(path.join(pathMine, "items"));
+            fs.writeFileSync(
+              path.join(
+                pathMine,
+                "items",
+                `${path.basename(pathFile).match(/^([^\.]+)\..*$/)![1]}.json`
+              ),
+              code
+            );
+          } else if (path.basename(pathFile).includes("block")) {
+            if (!fs.existsSync(path.join(pathMine, "blocks")))
+              fs.mkdirSync(path.join(pathMine, "blocks"));
+            fs.writeFileSync(
+              path.join(
+                pathMine,
+                "blocks",
+                `${path.basename(pathFile).match(/^([^\.]+)\..*$/)![1]}.json`
+              ),
+              code
+            );
+          } else {
+            if (!fs.existsSync(path.join(pathMine, "entities")))
+              fs.mkdirSync(path.join(pathMine, "entities"));
+            fs.writeFileSync(
+              path.join(
+                pathMine,
+                "entities",
+                `${path.basename(pathFile).match(/^([^\.]+)\..*$/)![1]}.json`
+              ),
+              code
+            );
+          }
+          fs.rmSync(
+            path.join(
+              pathMine,
+              "node_modules",
+              "@scriptmc/jsonts",
+              `${
+                path
+                  .basename(pathFile)
+                  .match(/^.*\.(item|block|entity)\..*$/)![1]
+              }.json`
+            ),
+            { force: true, recursive: true }
+          );
+          console.clear();
+          event(
+            "sucess",
+            `change ${colors.blue(colors.italic(path.basename(pathFile)))} file`
+          );
+        }
+        if (js)
+          fs.rmSync(
+            path.join(pathDir, path.basename(pathFile).replace(".ts", ".js")),
+            {
               force: true,
               recursive: true,
-            });
-        });
+            }
+          );
       });
       event("sucess", "Transpilation enabled");
     }

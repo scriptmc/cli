@@ -28,7 +28,7 @@ export const list: List[] = [
   {
     name: "--version",
     flag: "-v",
-    exec: () => console.log(colors.blue(`Version: ${colors.reset("1.0.0")}`)),
+    exec: () => console.log(colors.blue(`Version: ${colors.reset("1.0.1")}`)),
   },
   {
     name: "--new",
