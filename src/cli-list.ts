@@ -28,7 +28,7 @@ export const list: List[] = [
   {
     name: "--version",
     flag: "-v",
-    exec: () => console.log(colors.blue(`Version: ${colors.reset("1.0.1")}`)),
+    exec: () => console.log(colors.blue(`Version: ${colors.reset("1.0.2")}`)),
   },
   {
     name: "--new",
@@ -591,11 +591,13 @@ export const list: List[] = [
           .filter((behavior) =>
             fs.existsSync(path.join(pathMine[0], behavior, "manifest.json"))
           );
-        if (behaviors.length <= 0) {
-          event("error", "No behaviors found.");
-          return;
-        }
-        const { type, name } = await inquirer.prompt([
+        if (behaviors.length <= 0) event("error", "No behaviors found.");
+        const resources: string[] = fs
+          .readdirSync(pathMine[1])
+          .filter((resource) =>
+            fs.existsSync(path.join(pathMine[1], resource, "manifest.json"))
+          );
+        const { type, nameB, nameR } = await inquirer.prompt([
           {
             type: "list",
             name: "type",
@@ -612,7 +614,7 @@ export const list: List[] = [
           },
           {
             type: "search",
-            name: "name",
+            name: "nameB",
             message: "Behavior name:",
             source: (term) => {
               return behaviors
@@ -626,8 +628,28 @@ export const list: List[] = [
                 });
             },
           },
+          {
+            when: (data) => {
+              if (resources.length <= 0) event("error", "No resources found.");
+              return data.type.includes("JsonTS");
+            },
+            type: "search",
+            name: "nameR",
+            message: "Resource name:",
+            source: (term) => {
+              return resources
+                .filter((resource) =>
+                  resource.toLowerCase().includes(term?.toLowerCase() || "")
+                )
+                .sort((a: string, b: string) => {
+                  if (a === term && b !== term) return -1;
+                  if (a !== term && b === term) return 1;
+                  return a.localeCompare(b);
+                });
+            },
+          },
         ]);
-        start(type, name);
+        start(type, nameB, nameR);
       } catch (err) {
         const error: { message: string } = err as { message: string };
         if (!error.message.includes("SIGINT")) return console.error(err);
