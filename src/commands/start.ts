@@ -124,6 +124,11 @@ async function getFolder(
   }
   return [
     path.join(os.homedir(), pathMine, "development_behavior_packs", nameB),
-    path.join(os.homedir(), pathMine, "development_resource_packs", nameR),
+    path.join(
+      os.homedir(),
+      pathMine,
+      "development_resource_packs",
+      nameR || ""
+    ),
   ];
 }

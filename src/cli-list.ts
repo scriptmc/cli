@@ -28,7 +28,7 @@ export const list: List[] = [
   {
     name: "--version",
     flag: "-v",
-    exec: () => console.log(colors.blue(`Version: ${colors.reset("1.0.2")}`)),
+    exec: () => console.log(colors.blue(`Version: ${colors.reset("1.0.6")}`)),
   },
   {
     name: "--new",
@@ -44,15 +44,9 @@ export const list: List[] = [
               const addons: string[] = [];
               if (term) addons.push(term);
               if (pathMine[0]) {
-                return addons
-                  .filter(
-                    (addon) => !fs.readdirSync(pathMine[0])?.includes(addon)
-                  )
-                  .sort((a: string, b: string) => {
-                    if (a === term && b !== term) return -1;
-                    if (a !== term && b === term) return 1;
-                    return a.localeCompare(b);
-                  });
+                return addons.filter(
+                  (addon) => !fs.readdirSync(pathMine[0])?.includes(addon)
+                );
               }
               return addons;
             },

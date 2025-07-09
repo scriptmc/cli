@@ -18,11 +18,7 @@ export function jsonTS(pathMine: string[], nameB: string) {
     });
     watcher.on("change", async (pathFile) => {
       let js: boolean = false;
-      if (
-        path.basename(pathFile).endsWith(".item.ts") ||
-        path.basename(pathFile).endsWith(".block.ts") ||
-        path.basename(pathFile).endsWith(".entity.ts")
-      ) {
+      if (path.basename(pathFile).endsWith(".jt.ts")) {
         await build({
           entryPoints: [pathFile],
           outfile: path.join(
@@ -42,13 +38,14 @@ export function jsonTS(pathMine: string[], nameB: string) {
           path.join(pathDir, path.basename(pathFile).replace(".ts", ".js")),
         ]);
       } catch (err) {
-        fs.rmSync(
-          path.join(pathDir, path.basename(pathFile).replace(".ts", ".js")),
-          {
-            force: true,
-            recursive: true,
-          }
-        );
+        if (js)
+          fs.rmSync(
+            path.join(pathDir, path.basename(pathFile).replace(".ts", ".js")),
+            {
+              force: true,
+              recursive: true,
+            }
+          );
         return;
       }
       fs.readdirSync(

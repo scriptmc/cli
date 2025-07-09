@@ -25,34 +25,36 @@ export async function init(name: string): Promise<void> {
     fs.mkdirSync(path.join(pathMine, "jsonTS"));
   console.clear();
   event("sucess", "jsonTS initialized successfully. (to create the jsons:)");
+  console.log(colors.bold(colors.blue("jsonTS/<filename>.jt.<ts/js>")));
   console.log(
     colors.bold(
-      `${colors.blue("\n- Entity:")} ${colors.magenta(
-        "jsonTS/<filename>.entity.<ts/js>"
-      )}`
+      `${colors.blue("\n- Example:")} ${colors.magenta("jsonTS/clock.jt.ts")}\n`
     )
   );
-  console.log(
-    colors.bold(
-      `${colors.blue("\n- Block:")} ${colors.magenta(
-        "jsonTS/<filename>.block.<ts/js>"
-      )}`
+  if (
+    !fs.existsSync(
+      path.join(pathMine, "node_modules", "@scriptmc/jsonts", "executes")
     )
-  );
-  console.log(
-    colors.bold(
-      `${colors.blue("\n- Item:")} ${colors.magenta(
-        "jsonTS/<filename>.item.<ts/js>"
-      )}`
+  )
+    fs.mkdirSync(
+      path.join(pathMine, "node_modules", "@scriptmc/jsonts", "executes")
+    );
+  if (
+    !fs.existsSync(
+      path.join(pathMine, "node_modules", "@scriptmc/jsonts", "executes", "beh")
     )
-  );
-  console.log(
-    colors.bold(
-      `${colors.blue("\n- Example:")} ${colors.magenta(
-        "jsonTS/clock.item.ts"
-      )}\n`
+  )
+    fs.mkdirSync(
+      path.join(pathMine, "node_modules", "@scriptmc/jsonts", "executes", "beh")
+    );
+  if (
+    !fs.existsSync(
+      path.join(pathMine, "node_modules", "@scriptmc/jsonts", "executes", "reh")
     )
-  );
+  )
+    fs.mkdirSync(
+      path.join(pathMine, "node_modules", "@scriptmc/jsonts", "executes", "reh")
+    );
 }
 
 function getFolder(name: string): string {
