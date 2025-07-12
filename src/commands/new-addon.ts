@@ -3,13 +3,15 @@ import path from "node:path";
 import os from "node:os";
 import { v4 as uuidv4 } from "uuid";
 import { event } from "../event";
+import inquirer from "inquirer";
+import { execSync } from "node:child_process";
 
-export function new_addon(
+export async function new_addon(
   name: string,
   description: string,
   script: string,
   language: string
-): void {
+): Promise<void> {
   const pathMine: string[] = getFolder(name);
   if (pathMine.length <= 0) return;
   const behavior_uuid: string = uuidv4();
@@ -105,6 +107,15 @@ export function new_addon(
     );
   }
   event("sucess", `Addon created successfully: ${name}`);
+  const { code } = await inquirer.prompt([
+    {
+      type: "confirm",
+      name: "code",
+      message: "Open with Visual studio code?",
+    },
+  ]);
+  if (!code) return;
+  execSync(`code ${pathMine[0]} ${pathMine[1]}`);
 }
 
 function getFolder(name: string): string[] {

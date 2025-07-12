@@ -28,7 +28,7 @@ export const list: List[] = [
   {
     name: "--version",
     flag: "-v",
-    exec: () => console.log(colors.blue(`Version: ${colors.reset("1.0.6")}`)),
+    exec: () => console.log(colors.blue(`Version: ${colors.reset("1.0.7")}`)),
   },
   {
     name: "--new",
@@ -585,27 +585,14 @@ export const list: List[] = [
           .filter((behavior) =>
             fs.existsSync(path.join(pathMine[0], behavior, "manifest.json"))
           );
-        if (behaviors.length <= 0) event("error", "No behaviors found.");
         const resources: string[] = fs
           .readdirSync(pathMine[1])
           .filter((resource) =>
             fs.existsSync(path.join(pathMine[1], resource, "manifest.json"))
           );
-        const { type, nameB, nameR } = await inquirer.prompt([
-          {
-            type: "list",
-            name: "type",
-            message: "Compiler:",
-            choices: [colors.yellow("JsonTS"), colors.blue("Ts")],
-            theme: {
-              icon: {
-                cursor: "–→",
-              },
-              style: {
-                highlight: (text: string) => colors.bold(` ${text}`),
-              },
-            },
-          },
+        if (behaviors.length <= 0 || resources.length <= 0)
+          event("error", "No addons found.");
+        const { nameB, nameR } = await inquirer.prompt([
           {
             type: "search",
             name: "nameB",
@@ -623,10 +610,6 @@ export const list: List[] = [
             },
           },
           {
-            when: (data) => {
-              if (resources.length <= 0) event("error", "No resources found.");
-              return data.type.includes("JsonTS");
-            },
             type: "search",
             name: "nameR",
             message: "Resource name:",
@@ -643,7 +626,7 @@ export const list: List[] = [
             },
           },
         ]);
-        start(type, nameB, nameR);
+        start(nameB, nameR);
       } catch (err) {
         const error: { message: string } = err as { message: string };
         if (!error.message.includes("SIGINT")) return console.error(err);

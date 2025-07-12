@@ -8,23 +8,21 @@ import colors from "yoctocolors-cjs";
 import { event } from "../event";
 import { jsonTS } from "./jsonts";
 
-export async function start(
-  type: string,
-  nameB: string,
-  nameR: string
-): Promise<void> {
-  const pathMine: string[] = await getFolder(type, nameB, nameR);
+export async function start(nameB: string, nameR: string): Promise<void> {
+  const pathMine: string[] = await getFolder(nameB, nameR);
   if (pathMine.length <= 0) return;
-  if (!type.includes("JsonTS")) {
-    const tsFolder: string = fs
-      .readFileSync(path.join(__dirname, "../../configs/build.config"), "utf-8")
-      .match(/\$tsFolder:.*\$/)![0]
-      .replace(/\$tsFolder:\s(.*)\$/, "$1");
-    const watcher = chokidar.watch(path.join(pathMine[0], tsFolder), {
-      ignoreInitial: true,
-    });
+  const tsFolder: string = fs
+    .readFileSync(path.join(__dirname, "../../configs/build.config"), "utf-8")
+    .match(/\$tsFolder:.*\$/)![0]
+    .replace(/\$tsFolder:\s(.*)\$/, "$1");
+  const watcher = chokidar.watch(path.join(pathMine[0]), {
+    ignoreInitial: true,
+  });
 
-    watcher.on("all", (eventFile, pathFile) => {
+  watcher.on("change", (pathFile) => {
+    if (pathFile.endsWith(`jsonTS\\${path.basename(pathFile)}`)) {
+      jsonTS(pathMine, nameB, pathFile);
+    } else if (pathFile.endsWith(`${tsFolder}\\${path.basename(pathFile)}`)) {
       build({
         entryPoints: [path.join(pathMine[0], `${tsFolder}/**/*.ts`)],
         outdir: path.join(pathMine[0], "scripts"),
@@ -37,26 +35,15 @@ export async function start(
       console.clear();
       event(
         "sucess",
-        `${eventFile} ${colors.blue(
-          colors.italic(path.basename(pathFile))
-        )} file`
+        `change ${colors.blue(colors.italic(path.basename(pathFile)))} file`
       );
-    });
+    } else return;
+  });
 
-    event(
-      "sucess",
-      `Transpilation enabled (edit ${colors.blue(
-        colors.italic(path.join(pathMine[0], tsFolder, "main.ts"))
-      )} file)`
-    );
-  } else jsonTS(pathMine, nameB);
+  event("sucess", "Edit file...");
 }
 
-async function getFolder(
-  type: string,
-  nameB: string,
-  nameR: string
-): Promise<string[]> {
+async function getFolder(nameB: string, nameR: string): Promise<string[]> {
   const pathMine: string = fs
     .readFileSync(path.join(__dirname, "../../configs/path.config"), "utf-8")
     .match(/\$mojang:.*\$/)![0]
@@ -66,7 +53,6 @@ async function getFolder(
     .match(/\$tsFolder:.*\$/)![0]
     .replace(/\$tsFolder:\s(.*)\$/, "$1");
   if (
-    !type.includes("JsonTS") &&
     !fs.existsSync(
       path.join(
         os.homedir(),
