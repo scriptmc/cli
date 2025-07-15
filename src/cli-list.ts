@@ -12,6 +12,7 @@ import { build_world } from "./commands/build-world.js";
 import { event } from "./event.js";
 import { Settings } from "./commands/settings.js";
 import { init } from "./commands/init.js";
+import { open } from "./commands/open.js";
 
 interface List {
   name: string;
@@ -28,7 +29,7 @@ export const list: List[] = [
   {
     name: "--version",
     flag: "-v",
-    exec: () => console.log(colors.blue(`Version: ${colors.reset("1.0.7")}`)),
+    exec: () => console.log(colors.blue(`Version: ${colors.reset("1.1.0")}`)),
   },
   {
     name: "--new",
@@ -42,10 +43,21 @@ export const list: List[] = [
             message: "Addon name:",
             source: (term) => {
               const addons: string[] = [];
+              const wordFolder: string[] = JSON.parse(
+                fs
+                  .readFileSync(
+                    path.join(__dirname, "../configs/build.config"),
+                    "utf-8"
+                  )
+                  .match(/\$buildName:.*\$/)![0]
+                  .replace(/\$buildName:\s(.*)\$/, "$1")
+              );
               if (term) addons.push(term);
               if (pathMine[0]) {
                 return addons.filter(
-                  (addon) => !fs.readdirSync(pathMine[0])?.includes(addon)
+                  (addon) =>
+                    !fs.readdirSync(pathMine[0])?.includes(addon) &&
+                    addon.match(/^[a-zA-Z0-9\s_@-]+(?:@\$)*$/)
                 );
               }
               return addons;
@@ -671,6 +683,71 @@ export const list: List[] = [
           },
         ]);
         init(name);
+      } catch (err) {
+        const error: { message: string } = err as { message: string };
+        if (!error.message.includes("SIGINT")) return console.error(err);
+        console.clear();
+        event("sucess", "Leaving...");
+      }
+    },
+  },
+  {
+    name: "open",
+    exec: async (pathMine) => {
+      try {
+        if (pathMine.length <= 0) {
+          event("error", "No addons found.");
+          return;
+        }
+        const behaviors: string[] = fs
+          .readdirSync(pathMine[0])
+          .filter((behavior) =>
+            fs.existsSync(path.join(pathMine[0], behavior, "manifest.json"))
+          );
+        const resources: string[] = fs
+          .readdirSync(pathMine[1])
+          .filter((resource) =>
+            fs.existsSync(path.join(pathMine[1], resource, "manifest.json"))
+          );
+        if (behaviors.length <= 0 || resources.length <= 0) {
+          event("error", "No addons found.");
+          return;
+        }
+        const { nameB, nameR } = await inquirer.prompt([
+          {
+            type: "search",
+            name: "nameB",
+            message: "Behavior name:",
+            source: (term) => {
+              return behaviors
+                .filter((behavior) =>
+                  behavior.toLowerCase().includes(term?.toLowerCase() || "")
+                )
+                .sort((a: string, b: string) => {
+                  if (a === term && b !== term) return -1;
+                  if (a !== term && b === term) return 1;
+                  return a.localeCompare(b);
+                });
+            },
+          },
+          {
+            type: "search",
+            name: "nameR",
+            message: "Resource name:",
+            source: (term) => {
+              return resources
+                .filter((resource) =>
+                  resource.toLowerCase().includes(term?.toLowerCase() || "")
+                )
+                .sort((a: string, b: string) => {
+                  if (a === term && b !== term) return -1;
+                  if (a !== term && b === term) return 1;
+                  return a.localeCompare(b);
+                });
+            },
+          },
+        ]);
+        open(nameB, nameR);
       } catch (err) {
         const error: { message: string } = err as { message: string };
         if (!error.message.includes("SIGINT")) return console.error(err);

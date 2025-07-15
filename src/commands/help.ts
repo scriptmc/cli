@@ -14,5 +14,6 @@ export function message_help(): void {
   );
   console.log(" →" + " start - start transpiler ts to js.");
   console.log(" →" + " init - init jsonTS.");
+  console.log(" →" + " open - open addon in vscode.");
   console.log("\x1b[0m");
 }

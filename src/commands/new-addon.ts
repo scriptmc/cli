@@ -115,7 +115,7 @@ export async function new_addon(
     },
   ]);
   if (!code) return;
-  execSync(`code ${pathMine[0]} ${pathMine[1]}`);
+  execSync(`code "${pathMine[0]}" "${pathMine[1]}"`);
 }
 
 function getFolder(name: string): string[] {
@@ -123,6 +123,12 @@ function getFolder(name: string): string[] {
     .readFileSync(path.join(__dirname, "../../configs/path.config"), "utf-8")
     .match(/\$mojang:.*\$/)![0]
     .replace(/\$mojang:\s(.*)\$/, "$1");
+  const wordFolder: string[] = JSON.parse(
+    fs
+      .readFileSync(path.join(__dirname, "../../configs/build.config"), "utf-8")
+      .match(/\$buildName:.*\$/)![0]
+      .replace(/\$buildName:\s(.*)\$/, "$1")
+  );
   if (
     !fs.existsSync(
       path.join(os.homedir(), pathMine, "development_behavior_packs")
@@ -139,15 +145,40 @@ function getFolder(name: string): string[] {
     fs.mkdirSync(
       path.join(os.homedir(), pathMine, "development_resource_packs")
     );
+  const nameFolder: string[] = [name, name];
+  if (name.endsWith("@$")) {
+    nameFolder[0] = name.replace(/@\$$/, wordFolder[0]);
+    nameFolder[1] = name.replace(/@\$$/, wordFolder[1]);
+  }
   fs.mkdirSync(
-    path.join(os.homedir(), pathMine, "development_behavior_packs", name)
+    path.join(
+      os.homedir(),
+      pathMine,
+      "development_behavior_packs",
+      nameFolder[0]
+    )
   );
   fs.mkdirSync(
-    path.join(os.homedir(), pathMine, "development_resource_packs", name)
+    path.join(
+      os.homedir(),
+      pathMine,
+      "development_resource_packs",
+      nameFolder[1]
+    )
   );
   return [
-    path.join(os.homedir(), pathMine, "development_behavior_packs", name),
-    path.join(os.homedir(), pathMine, "development_resource_packs", name),
+    path.join(
+      os.homedir(),
+      pathMine,
+      "development_behavior_packs",
+      nameFolder[0]
+    ),
+    path.join(
+      os.homedir(),
+      pathMine,
+      "development_resource_packs",
+      nameFolder[1]
+    ),
   ];
 }
 

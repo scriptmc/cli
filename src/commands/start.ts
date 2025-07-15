@@ -48,66 +48,6 @@ async function getFolder(nameB: string, nameR: string): Promise<string[]> {
     .readFileSync(path.join(__dirname, "../../configs/path.config"), "utf-8")
     .match(/\$mojang:.*\$/)![0]
     .replace(/\$mojang:\s(.*)\$/, "$1");
-  const tsFolder: string = fs
-    .readFileSync(path.join(__dirname, "../../configs/build.config"), "utf-8")
-    .match(/\$tsFolder:.*\$/)![0]
-    .replace(/\$tsFolder:\s(.*)\$/, "$1");
-  if (
-    !fs.existsSync(
-      path.join(
-        os.homedir(),
-        pathMine,
-        "development_behavior_packs",
-        nameB,
-        tsFolder,
-        "main.ts"
-      )
-    )
-  ) {
-    event("error", `Typescript not found: ${nameB}`);
-    const { create } = await inquirer.prompt([
-      {
-        type: "confirm",
-        name: "create",
-        message: "Do create typescript in this addon?",
-      },
-    ]);
-    if (create) {
-      if (
-        !fs.existsSync(
-          path.join(
-            os.homedir(),
-            pathMine,
-            "development_behavior_packs",
-            nameB,
-            tsFolder
-          )
-        )
-      )
-        fs.mkdirSync(
-          path.join(
-            os.homedir(),
-            pathMine,
-            "development_behavior_packs",
-            nameB,
-            tsFolder
-          )
-        );
-      fs.writeFileSync(
-        path.join(
-          os.homedir(),
-          pathMine,
-          "development_behavior_packs",
-          nameB,
-          tsFolder,
-          "main.ts"
-        ),
-        ""
-      );
-      event("sucess", `Typescript added for the addon: ${nameB}`);
-    }
-    return [];
-  }
   return [
     path.join(os.homedir(), pathMine, "development_behavior_packs", nameB),
     path.join(
