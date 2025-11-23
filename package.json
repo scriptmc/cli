@@ -21,7 +21,7 @@
     "addon maker",
     "cli"
   ],
-  "author": "athumjs",
+  "author": "ScriptMC",
   "license": "MIT",
   "type": "commonjs",
   "dependencies": {
