@@ -24,7 +24,7 @@ npm install -g @scriptmc/cli@latest
 
 ## 📓 License
 
-MIT &copy; 2025 [Athumjs](https://github.com/Athumjs)
+MIT &copy; 2025 [ScriptMC](https://github.com/scriptmc)
 
 ---
 
